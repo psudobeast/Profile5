@@ -56,6 +56,7 @@
                                  VerticalOptions="End"
                                  Clicked="OnChangePictureClicked" />
                 </Grid>
+
             </VerticalStackLayout>
 
             <!-- Card container for personal information -->
@@ -76,6 +77,7 @@
 
                 <!-- Form Fields -->
                 <VerticalStackLayout Spacing="20">
+                    <Label Text="Personal Information" FontSize="16" FontAttributes="Bold" TextColor="#2D3436" />
 
                     <!-- Section Title -->
                     <Label Text="Personal Information"
