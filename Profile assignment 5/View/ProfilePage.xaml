@@ -4,6 +4,7 @@
              x:Class="Profile_assignment_5.View.ProfilePage"
              Title="ProfilePage"
              BackgroundColor="#F5F6FA"
+             Shell.NavBarIsVisible="False"
              >
 
 
@@ -56,6 +57,7 @@
                                  VerticalOptions="End"
                                  Clicked="OnChangePictureClicked" />
                 </Grid>
+
             </VerticalStackLayout>
 
             <!-- Card container for personal information -->
@@ -76,6 +78,7 @@
 
                 <!-- Form Fields -->
                 <VerticalStackLayout Spacing="20">
+                   
 
                     <!-- Section Title -->
                     <Label Text="Personal Information"
