@@ -1,7 +1,11 @@
 ﻿using System.Text.Json;
+using SQLite;
 
 public class Profile
 {
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+
     public string Name { get; set; }
     public string Surname { get; set; }
     public string EmailAddress { get; set; }

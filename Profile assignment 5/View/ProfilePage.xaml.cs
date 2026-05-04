@@ -1,47 +1,49 @@
+using Profile_assignment_5.Services;
 
 namespace Profile_assignment_5.View
 {
     public partial class ProfilePage : ContentPage
     {
-        private readonly string filePath;
+        private readonly DatabaseService _databaseService;
+        private Profile _currentProfile;
 
-        public ProfilePage()
+        public ProfilePage(DatabaseService databaseService)
         {
             InitializeComponent();
-
-            // Define the file path for storing profile data
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "profile.json");
-
-            // Load profile data when page appears
-            LoadProfileAsync();
+            _databaseService = databaseService;
         }
 
-        // Method to load profile data from local storage
-        private async void LoadProfileAsync()
+        protected override async void OnAppearing()
         {
-            if (File.Exists(filePath))
+            base.OnAppearing();
+            await LoadProfileAsync();
+        }
+
+        // Method to load profile data from database
+        private async Task LoadProfileAsync()
+        {
+            _currentProfile = await _databaseService.GetProfileAsync();
+
+            if (_currentProfile != null)
             {
-                try
+                // Pre-populate fields
+                NameEntry.Text = _currentProfile.Name;
+                SurnameEntry.Text = _currentProfile.Surname;
+                EmailEntry.Text = _currentProfile.EmailAddress;
+                BioEditor.Text = _currentProfile.Bio;
+
+                // Load profile picture if stored
+                if (!string.IsNullOrEmpty(_currentProfile.ProfilePictureBase64))
                 {
-                    string json = await File.ReadAllTextAsync(filePath);
-                    Profile profile = Profile.FromJson(json);
-
-                    // Pre-populate fields
-                    NameEntry.Text = profile.Name;
-                    SurnameEntry.Text = profile.Surname;
-                    EmailEntry.Text = profile.EmailAddress;
-                    BioEditor.Text = profile.Bio;
-
-                    // Load profile picture if stored (optional)
-                    if (profile.ProfilePictureBase64 != null)
+                    try
                     {
-                        var imageBytes = Convert.FromBase64String(profile.ProfilePictureBase64);
+                        var imageBytes = Convert.FromBase64String(_currentProfile.ProfilePictureBase64);
                         ProfileImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
                     }
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", $"Failed to load profile: {ex.Message}", "OK");
+                    catch (Exception ex)
+                    {
+                        await DisplayAlert("Error", $"Failed to load profile picture: {ex.Message}", "OK");
+                    }
                 }
             }
         }
@@ -49,22 +51,27 @@ namespace Profile_assignment_5.View
         // Save profile data
         private async void OnSaveClicked(object sender, EventArgs e)
         {
-            string profilePictureBase64 = null;
+            string profilePictureBase64 = _currentProfile?.ProfilePictureBase64;
 
             // Save profile picture as Base64 (if changed)
             if (ProfileImage.Source is StreamImageSource streamSource && streamSource.Stream != null)
             {
-                using var stream = await streamSource.Stream(CancellationToken.None);
-                if (stream != null)
+                try
                 {
-                    var memoryStream = new MemoryStream();
-                    await stream.CopyToAsync(memoryStream);
-                    profilePictureBase64 = Convert.ToBase64String(memoryStream.ToArray());
+                    using var stream = await streamSource.Stream(CancellationToken.None);
+                    if (stream != null)
+                    {
+                        var memoryStream = new MemoryStream();
+                        await stream.CopyToAsync(memoryStream);
+                        profilePictureBase64 = Convert.ToBase64String(memoryStream.ToArray());
+                    }
                 }
+                catch { }
             }
 
             var profile = new Profile
             {
+                Id = _currentProfile?.Id ?? 0,
                 Name = NameEntry.Text,
                 Surname = SurnameEntry.Text,
                 EmailAddress = EmailEntry.Text,
@@ -72,11 +79,11 @@ namespace Profile_assignment_5.View
                 ProfilePictureBase64 = profilePictureBase64
             };
 
-            string json = profile.ToJson();
             try
             {
-                await File.WriteAllTextAsync(filePath, json);
+                await _databaseService.SaveProfileAsync(profile);
                 await DisplayAlert("Success", "Profile saved successfully.", "OK");
+                await LoadProfileAsync();
             }
             catch (Exception ex)
             {
@@ -122,6 +129,12 @@ namespace Profile_assignment_5.View
                     await DisplayAlert("Error", $"Failed to load image: {ex.Message}", "OK");
                 }
             }
+        }
+
+        // Navigate to Shopping List
+        private async void OnGoToShoppingClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//ShoppingListPage");
         }
     }
 }

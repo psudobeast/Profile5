@@ -197,6 +197,21 @@
                 </Button.Shadow>
             </Button>
 
+            <!-- Go to Shopping Button -->
+            <Button Text="Go to Shopping List" 
+                    BackgroundColor="#00B894" 
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    HeightRequest="55"
+                    CornerRadius="15"
+                    Clicked="OnGoToShoppingClicked">
+
+                <!-- Button shadow for emphasis -->
+                <Button.Shadow>
+                    <Shadow Brush="#00B894" Offset="0,8" Radius="12" Opacity="0.3" />
+                </Button.Shadow>
+            </Button>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

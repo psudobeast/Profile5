@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Profile_assignment_5.Services;
+using Profile_assignment_5.View;
 
 namespace Profile_assignment_5
 {
@@ -14,6 +16,15 @@ namespace Profile_assignment_5
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+            // Register DatabaseService as Singleton
+            builder.Services.AddSingleton<DatabaseService>();
+
+            // Register Pages with Dependency Injection
+            builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<ShoppingListPage>();
+            builder.Services.AddTransient<ShoppingCartPage>();
+
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if ANDROID

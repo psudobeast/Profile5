@@ -8,7 +8,7 @@ namespace Profile_assignment_5
         {
             InitializeComponent();
 
-            MainPage = new View.ProfilePage();
+            MainPage = new AppShell();
         }
 
     }    
