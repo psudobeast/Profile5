@@ -5,13 +5,13 @@ namespace Profile_assignment_5.View
 {
     public partial class ShoppingListPage : ContentPage
     {
-        private readonly DatabaseService _databaseService;
+        private readonly SupabaseService _supabaseService;
         private Profile _currentProfile;
 
-        public ShoppingListPage(DatabaseService databaseService)
+        public ShoppingListPage(SupabaseService supabaseService)
         {
             InitializeComponent();
-            _databaseService = databaseService;
+            _supabaseService = supabaseService;
         }
 
         protected override async void OnAppearing()
@@ -22,7 +22,7 @@ namespace Profile_assignment_5.View
 
         private async Task LoadDataAsync()
         {
-            _currentProfile = await _databaseService.GetProfileAsync();
+            _currentProfile = await _supabaseService.GetProfileAsync();
 
             if (_currentProfile == null)
             {
@@ -31,7 +31,7 @@ namespace Profile_assignment_5.View
                 return;
             }
 
-            var items = await _databaseService.GetShoppingItemsAsync();
+            var items = await _supabaseService.GetShoppingItemsAsync();
             ShoppingItemsCollection.ItemsSource = items;
         }
 
@@ -54,7 +54,7 @@ namespace Profile_assignment_5.View
                 return;
             }
 
-            var cartItems = await _databaseService.GetCartItemsAsync(_currentProfile.Id);
+            var cartItems = await _supabaseService.GetCartItemsAsync(_currentProfile.Id);
             var existingCartItem = cartItems.FirstOrDefault(c => c.ShoppingItemId == item.Id);
 
             int currentCartQuantity = existingCartItem?.Quantity ?? 0;
@@ -72,7 +72,7 @@ namespace Profile_assignment_5.View
                 Quantity = 1
             };
 
-            await _databaseService.AddToCartAsync(cartItem);
+            await _supabaseService.AddToCartAsync(cartItem);
             await DisplayAlert("Success", $"{item.Name} added to cart!", "OK");
         }
 

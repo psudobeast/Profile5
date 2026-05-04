@@ -11,13 +11,13 @@ namespace Profile_assignment_5.View
 
     public partial class ShoppingCartPage : ContentPage
     {
-        private readonly DatabaseService _databaseService;
+        private readonly SupabaseService _supabaseService;
         private Profile _currentProfile;
 
-        public ShoppingCartPage(DatabaseService databaseService)
+        public ShoppingCartPage(SupabaseService supabaseService)
         {
             InitializeComponent();
-            _databaseService = databaseService;
+            _supabaseService = supabaseService;
         }
 
         protected override async void OnAppearing()
@@ -28,7 +28,7 @@ namespace Profile_assignment_5.View
 
         private async Task LoadCartAsync()
         {
-            _currentProfile = await _databaseService.GetProfileAsync();
+            _currentProfile = await _supabaseService.GetProfileAsync();
 
             if (_currentProfile == null)
             {
@@ -37,12 +37,12 @@ namespace Profile_assignment_5.View
                 return;
             }
 
-            var cartItems = await _databaseService.GetCartItemsAsync(_currentProfile.Id);
+            var cartItems = await _supabaseService.GetCartItemsAsync(_currentProfile.Id);
             var viewModels = new List<CartItemViewModel>();
 
             foreach (var cart in cartItems)
             {
-                var item = await _databaseService.GetShoppingItemAsync(cart.ShoppingItemId);
+                var item = await _supabaseService.GetShoppingItemAsync(cart.ShoppingItemId);
                 if (item != null)
                 {
                     viewModels.Add(new CartItemViewModel
@@ -77,7 +77,7 @@ namespace Profile_assignment_5.View
             }
 
             viewModel.Cart.Quantity++;
-            await _databaseService.UpdateCartQuantityAsync(viewModel.Cart);
+            await _supabaseService.UpdateCartQuantityAsync(viewModel.Cart);
             await LoadCartAsync();
         }
 
@@ -91,7 +91,7 @@ namespace Profile_assignment_5.View
             if (viewModel.Cart.Quantity > 1)
             {
                 viewModel.Cart.Quantity--;
-                await _databaseService.UpdateCartQuantityAsync(viewModel.Cart);
+                await _supabaseService.UpdateCartQuantityAsync(viewModel.Cart);
                 await LoadCartAsync();
             }
             else
@@ -99,7 +99,7 @@ namespace Profile_assignment_5.View
                 bool confirm = await DisplayAlert("Remove Item", $"Remove {viewModel.Item.Name} from cart?", "Yes", "No");
                 if (confirm)
                 {
-                    await _databaseService.RemoveFromCartAsync(viewModel.Cart.Id);
+                    await _supabaseService.RemoveFromCartAsync(viewModel.Cart.Id);
                     await LoadCartAsync();
                 }
             }
@@ -115,7 +115,7 @@ namespace Profile_assignment_5.View
             bool confirm = await DisplayAlert("Remove Item", $"Remove {viewModel.Item.Name} from cart?", "Yes", "No");
             if (confirm)
             {
-                await _databaseService.RemoveFromCartAsync(viewModel.Cart.Id);
+                await _supabaseService.RemoveFromCartAsync(viewModel.Cart.Id);
                 await LoadCartAsync();
             }
         }
@@ -127,7 +127,7 @@ namespace Profile_assignment_5.View
             bool confirm = await DisplayAlert("Clear Cart", "Remove all items from your cart?", "Yes", "No");
             if (confirm)
             {
-                await _databaseService.ClearCartAsync(_currentProfile.Id);
+                await _supabaseService.ClearCartAsync(_currentProfile.Id);
                 await LoadCartAsync();
             }
         }

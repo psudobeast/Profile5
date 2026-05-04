@@ -17,7 +17,10 @@ namespace Profile_assignment_5
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Register DatabaseService as Singleton
+            // Register SupabaseService as Singleton (replacing DatabaseService)
+            builder.Services.AddSingleton<SupabaseService>();
+
+            // Keep DatabaseService for backward compatibility (optional)
             builder.Services.AddSingleton<DatabaseService>();
 
             // Register Pages with Dependency Injection

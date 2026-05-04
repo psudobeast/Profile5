@@ -4,13 +4,13 @@ namespace Profile_assignment_5.View
 {
     public partial class ProfilePage : ContentPage
     {
-        private readonly DatabaseService _databaseService;
+        private readonly SupabaseService _supabaseService;
         private Profile _currentProfile;
 
-        public ProfilePage(DatabaseService databaseService)
+        public ProfilePage(SupabaseService supabaseService)
         {
             InitializeComponent();
-            _databaseService = databaseService;
+            _supabaseService = supabaseService;
         }
 
         protected override async void OnAppearing()
@@ -22,7 +22,7 @@ namespace Profile_assignment_5.View
         // Method to load profile data from database
         private async Task LoadProfileAsync()
         {
-            _currentProfile = await _databaseService.GetProfileAsync();
+            _currentProfile = await _supabaseService.GetProfileAsync();
 
             if (_currentProfile != null)
             {
@@ -81,8 +81,8 @@ namespace Profile_assignment_5.View
 
             try
             {
-                await _databaseService.SaveProfileAsync(profile);
-                await DisplayAlert("Success", "Profile saved successfully.", "OK");
+                await _supabaseService.SaveProfileAsync(profile);
+                await DisplayAlert("Success", "Profile saved successfully to Supabase!", "OK");
                 await LoadProfileAsync();
             }
             catch (Exception ex)
